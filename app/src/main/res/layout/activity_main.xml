@@ -13,7 +13,8 @@
         android:layout_height="209dp"
         android:src="@drawable/mab_penoptes_tp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="3dp">
+        tools:layout_editor_absoluteX="3dp"
+        tools:ignore="ContentDescription,MissingConstraints">
 
     </ImageView>
 
@@ -26,7 +27,7 @@
         android:layout_marginEnd="54dp"
         android:layout_marginBottom="36dp"
         android:contentDescription="@string/bio_options_fab"
-        app:backgroundTint="@color/light_blue"
+        app:backgroundTint="@color/Blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_input_add" />

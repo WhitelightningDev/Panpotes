@@ -24,9 +24,9 @@ public class FingerprintDialog extends Dialog {
     public FingerprintDialog(@NonNull Context context, String name, String surname, String id) {
         super(context);
         this.context = context;
-        this.name = name;
-        this.surname = surname;
-        this.id = id;
+        this.name = this.name;
+        this.surname = this.surname;
+        this.id = this.id;
     }
 
     @Override

@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private static final int CAMERA_REQUEST_CODE = 100; // Define a request code for camera permissions
-    private PreviewView facePreviewView; // PreviewView to show the camera feed
     private Bitmap lastCapturedFrame;
 
     @Override
@@ -64,15 +63,19 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(view -> showAddPersonDialog());
     }
 
-    private void requestCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
-        }
+    private void showFingerprintDialog(String name, String surname, String id) {
+        // Create and show your custom fingerprint dialog
+        FingerprintDialog fingerprintDialog = new FingerprintDialog(this, name, surname, id);
+        fingerprintDialog.show(); // Show the custom fingerprint dialog
     }
 
 
 
+    private void requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -88,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private void setupCamera() {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 
@@ -101,14 +103,20 @@ public class MainActivity extends AppCompatActivity {
                         .requireLensFacing(CameraSelector.LENS_FACING_FRONT) // Front camera for face recognition
                         .build();
 
-                preview.setSurfaceProvider(facePreviewView.getSurfaceProvider());
-                // Face preview
+                // Ensure PreviewView is initialized correctly
+                PreviewView facePreviewView = findViewById(R.id.facePreviewView);
+                if (facePreviewView != null) {
+                    preview.setSurfaceProvider(facePreviewView.getSurfaceProvider());
+                } else {
+                    Log.e(TAG, "facePreviewView is null! Check your layout.");
+                    return; // Prevent further execution if facePreviewView is null
+                }
 
+                // Set up ImageAnalysis for face detection
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build();
 
-                // Analyzer for face detection
                 imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), imageProxy -> {
                     // Process the imageProxy here using your face detection logic or capture a bitmap
                     Bitmap bitmap = imageProxyToBitmap(imageProxy);
@@ -118,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
                     imageProxy.close(); // Close the imageProxy to avoid memory leaks
                 });
 
-
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
 
             } catch (ExecutionException | InterruptedException e) {
@@ -127,14 +134,12 @@ public class MainActivity extends AppCompatActivity {
         }, ContextCompat.getMainExecutor(this));
     }
 
-
     private void showAddPersonDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.dialog_add_person, null);
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
-                .setView(dialogView)
-                .setCancelable(true);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setView(dialogView);
 
         EditText inputName = dialogView.findViewById(R.id.input_name);
         EditText inputSurname = dialogView.findViewById(R.id.input_surname);
@@ -142,51 +147,32 @@ public class MainActivity extends AppCompatActivity {
         Button buttonNext = dialogView.findViewById(R.id.button_next);
         Button buttonCancel = dialogView.findViewById(R.id.button_cancel);
 
-        // Create the dialog
-        AlertDialog dialog = builder.create();
+        builder.setCancelable(true);
+        final androidx.appcompat.app.AlertDialog dialog = builder.create();
 
-        // Set click listener for the "Next" button
-        buttonNext.setOnClickListener(v -> {
-            String name = inputName.getText().toString();
-            String surname = inputSurname.getText().toString();
-            String id = inputId.getText().toString();
-            dialog.dismiss(); // Close the dialog
-            showFingerprintDialog(name, surname, id); // Show fingerprint dialog
+        buttonNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = inputName.getText().toString();
+                String surname = inputSurname.getText().toString();
+                String id = inputId.getText().toString();
+                dialog.dismiss(); // Close the dialog
+                showFingerprintDialog(name, surname, id); // Show fingerprint dialog
+            }
         });
 
-        // Set click listener for the "Cancel" button
-        buttonCancel.setOnClickListener(v -> dialog.dismiss()); // Close the dialog
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss(); // Close the dialog
+            }
+        });
 
-        dialog.show(); // Show the dialog
+        dialog.show();
     }
 
-    private void showFingerprintDialog(String name, String surname, String id) {
-        // Create and show the custom fingerprint dialog
-        FingerprintDialog fingerprintDialog = new FingerprintDialog(this, name, surname, id);
-        fingerprintDialog.show();
-    }
 
-    private void showExternalFingerprintScannerDialog(String name, String surname, String id) {
-        // Dialog for external fingerprint scanner
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
-                .setTitle("External Fingerprint Scanner")
-                .setMessage("Please connect the Columbo 2.0 fingerprint scanner.")
-                .setCancelable(true)
-                .setPositiveButton("Next", (dialog, which) -> initiateExternalScanner(name, surname, id))
-                .setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
-        builder.show();
-    }
-
-    private void initiateExternalScanner(String name, String surname, String id) {
-        // Example logic for the external fingerprint scanner
-        // Replace with actual scanner implementation
-    }
-
-    private boolean isFingerprintHardwareAvailable() {
-        // Check if the device has fingerprint hardware
-        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
-    }
 
     public void showFaceScanDialog(String name, String surname, String id) {
         showFaceCaptureDialog(name, surname, id);
@@ -196,20 +182,29 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.dialog_face_capture, null);
 
+        PreviewView facePreviewView = dialogView.findViewById(R.id.facePreviewView);
+        if (facePreviewView == null) {
+            Log.e(TAG, "facePreviewView is null! Check your dialog layout.");
+            return; // Early return if facePreviewView is null
+        }
+
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
                 .setView(dialogView)
                 .setCancelable(false);
 
-        facePreviewView = dialogView.findViewById(R.id.facePreviewView); // PreviewView for face preview
         Button buttonCapture = dialogView.findViewById(R.id.button_capture);
         Button buttonCancel = dialogView.findViewById(R.id.button_cancel);
 
         AlertDialog dialog = builder.create();
 
-        setupFaceCamera(facePreviewView); // Set up the face preview camera
+        // Show the dialog first
+        dialog.show();
+
+        // Set up the camera after the dialog is shown
+        setupFaceCamera(facePreviewView);
 
         buttonCapture.setOnClickListener(v -> {
-            Bitmap currentFrame = getCurrentCameraFrame(); // No arguments
+            Bitmap currentFrame = getCurrentCameraFrame();
 
             if (currentFrame == null) {
                 Snackbar.make(binding.fab, "Failed to capture camera frame.", Snackbar.LENGTH_SHORT).show();
@@ -232,14 +227,12 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
-        buttonCancel.setOnClickListener(v -> dialog.dismiss()); // Close the dialog
-
-        dialog.show();
+        buttonCancel.setOnClickListener(v -> dialog.dismiss());
     }
 
-
-
     private void setupFaceCamera(PreviewView previewView) {
+        Log.d(TAG, "Setting up face camera with PreviewView: " + previewView);
+
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try {
@@ -262,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
                     if (bitmap != null) {
                         lastCapturedFrame = bitmap; // Store the frame for later retrieval
                     }
-                    imageProxy.close();
+                    imageProxy.close(); // Close the imageProxy to avoid memory leaks
                 });
 
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
@@ -279,13 +272,16 @@ public class MainActivity extends AppCompatActivity {
 
     private Bitmap imageProxyToBitmap(ImageProxy imageProxy) {
         ImageProxy.PlaneProxy[] planes = imageProxy.getPlanes();
-        ByteBuffer buffer = planes[0].getBuffer();
-        byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes);
-
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+        if (planes.length > 0) {
+            ByteBuffer buffer = planes[0].getBuffer();
+            if (buffer != null) {
+                byte[] bytes = new byte[buffer.remaining()];
+                buffer.get(bytes);
+                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+            }
+        }
+        return null; // Return null if conversion fails
     }
-
 
     private void saveBiometricData(String name, String surname, String id) {
         // Save biometric data securely
