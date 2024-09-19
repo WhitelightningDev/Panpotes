@@ -1,3 +1,5 @@
 <resources>
       <dimen name="fab_margin">48dp</dimen>
+    <dimen name="logo_width">0.4</dimen>  <!-- 40% of the parent width -->
+    <dimen name="logo_height">0.15</dimen> <!-- 15% of the parent height -->
    </resources>
