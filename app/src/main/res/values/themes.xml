@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme using the updated color scheme -->
+    <style name="Base.Theme.Panoptes" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here with the new color scheme -->
+        <item name="colorPrimary">@color/Blue</item>
+        <item name="colorPrimaryVariant">@color/Navy_blue</item>
+        <item name="colorSecondary">@color/sky_blue</item>
+        <item name="colorSecondaryVariant">@color/pastel_blue</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/Navy_blue</item>
+        <item name="android:statusBarColor">@color/pastel_blue</item>
+    </style>
+
+    <!-- Theme extending Base.Theme.Panoptes -->
+    <style name="Theme.Panoptes" parent="Base.Theme.Panoptes" />
+</resources>

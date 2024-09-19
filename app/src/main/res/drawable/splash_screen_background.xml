@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background color (optional, usually white or your app's main color) -->
+    <item android:drawable="@color/white" />
+
+    <!-- Logo centered on the screen -->
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/mab_panoptes" /> <!-- replace with your logo -->
+    </item>
+</layer-list>

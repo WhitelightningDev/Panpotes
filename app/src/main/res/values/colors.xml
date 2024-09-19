@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!-- Normal Colors-->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+<!--    Blue scheme-->
+    <color name="Grey_blue">#98b2c5</color>
+    <color name="light_blue">#aedcfe</color>
+    <color name="sky_blue">#79bbfb</color>
+    <color name="pastel_blue">#368cb4</color>
+    <color name="Blue">#2778fc</color>
+    <color name="Navy_blue">#053bfe</color>
+</resources>
