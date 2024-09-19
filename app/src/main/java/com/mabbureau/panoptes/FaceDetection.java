@@ -23,14 +23,14 @@ public class FaceDetection {
     }
 
     private void initializeFaceDetector() {
-        // Set up the face detector options
+        // Set up face detection options
         FaceDetectorOptions options = new FaceDetectorOptions.Builder()
-                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST) // Use fast mode for quick detection
-                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL) // Classify facial features
+                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
                 .build();
 
-        // Initialize the face detector with the options from the ML Kit library
-        faceDetector = com.google.mlkit.vision.face.FaceDetection.getClient(options); // Ensure the correct method call
+        // Initialize the face detector
+        faceDetector = com.google.mlkit.vision.face.FaceDetection.getClient(options);
     }
 
     public Context getContext() {
@@ -48,30 +48,29 @@ public class FaceDetection {
             return;
         }
 
-        // Convert the current frame to an InputImage for face detection
+        // Convert Bitmap to InputImage
         InputImage image = InputImage.fromBitmap(currentFrame, 0);
 
-        // Use the face detector to analyze the current frame
+
+        // Start face detection
         faceDetector.process(image)
                 .addOnSuccessListener(faces -> {
                     if (!faces.isEmpty()) {
                         Log.d(TAG, "Face detected: " + faces.size());
                         callback.onScanSuccess(faces); // Notify success
                     } else {
-                        Log.d(TAG, "No face detected.");
-                        callback.onScanFailure("No face detected."); // Notify failure
+                        callback.onScanFailure("No face detected.");
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Face detection error: " + e.getMessage());
-                    callback.onScanFailure("Face detection error: " + e.getMessage()); // Notify error
+                    Log.e(TAG, "Face detection failed: " + e.getMessage());
+                    callback.onScanFailure("Face detection failed: " + e.getMessage());
                 });
     }
 
     public void stopFaceScan() {
-        // Stop any ongoing face detection processes if applicable
         if (faceDetector != null) {
-            faceDetector = null; // Clear reference to the face detector
+            faceDetector.close(); // Close the detector when done
         }
     }
 }

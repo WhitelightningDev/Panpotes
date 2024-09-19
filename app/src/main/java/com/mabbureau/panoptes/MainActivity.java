@@ -101,14 +101,23 @@ public class MainActivity extends AppCompatActivity {
                         .requireLensFacing(CameraSelector.LENS_FACING_FRONT) // Front camera for face recognition
                         .build();
 
-                preview.setSurfaceProvider(binding.previewView.getSurfaceProvider()); // Face preview
+                preview.setSurfaceProvider(facePreviewView.getSurfaceProvider());
+                // Face preview
 
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build();
 
                 // Analyzer for face detection
-                imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), new FaceAnalyzer());
+                imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), imageProxy -> {
+                    // Process the imageProxy here using your face detection logic or capture a bitmap
+                    Bitmap bitmap = imageProxyToBitmap(imageProxy);
+                    if (bitmap != null) {
+                        lastCapturedFrame = bitmap; // Store the frame for later retrieval
+                    }
+                    imageProxy.close(); // Close the imageProxy to avoid memory leaks
+                });
+
 
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
 
@@ -200,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         setupFaceCamera(facePreviewView); // Set up the face preview camera
 
         buttonCapture.setOnClickListener(v -> {
-            Bitmap currentFrame = getCurrentCameraFrame(facePreviewView); // Placeholder for camera frame
+            Bitmap currentFrame = getCurrentCameraFrame(); // No arguments
 
             if (currentFrame == null) {
                 Snackbar.make(binding.fab, "Failed to capture camera frame.", Snackbar.LENGTH_SHORT).show();
@@ -229,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     private void setupFaceCamera(PreviewView previewView) {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
@@ -241,22 +251,18 @@ public class MainActivity extends AppCompatActivity {
                         .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
                         .build();
 
-                // Set up ImageAnalysis to analyze the camera frames
+                // Set up ImageAnalysis for frame analysis
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build();
 
-                // Assign the analyzer to process the camera frames
-                imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), new ImageAnalysis.Analyzer() {
-                    @Override
-                    public void analyze(@NonNull ImageProxy imageProxy) {
-                        // Process the frame and convert to Bitmap
-                        Bitmap bitmap = imageProxyToBitmap(imageProxy);
-                        if (bitmap != null) {
-                            // Use the bitmap as needed
-                        }
-                        imageProxy.close(); // Close the frame after use
+                imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), imageProxy -> {
+                    // Convert the ImageProxy to Bitmap
+                    Bitmap bitmap = imageProxyToBitmap(imageProxy);
+                    if (bitmap != null) {
+                        lastCapturedFrame = bitmap; // Store the frame for later retrieval
                     }
+                    imageProxy.close();
                 });
 
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
@@ -267,22 +273,19 @@ public class MainActivity extends AppCompatActivity {
         }, ContextCompat.getMainExecutor(this));
     }
 
+    private Bitmap getCurrentCameraFrame() {
+        return lastCapturedFrame; // Return the last captured frame
+    }
+
     private Bitmap imageProxyToBitmap(ImageProxy imageProxy) {
         ImageProxy.PlaneProxy[] planes = imageProxy.getPlanes();
         ByteBuffer buffer = planes[0].getBuffer();
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
 
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
-        return bitmap;
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
     }
 
-
-
-
-    private Bitmap getCurrentCameraFrame(PreviewView previewView) {
-        return lastCapturedFrame; // Return the last captured frame from the analyzer
-    }
 
     private void saveBiometricData(String name, String surname, String id) {
         // Save biometric data securely
