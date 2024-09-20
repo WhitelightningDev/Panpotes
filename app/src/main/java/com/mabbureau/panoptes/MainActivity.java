@@ -274,11 +274,9 @@ public class MainActivity extends AppCompatActivity {
         ImageProxy.PlaneProxy[] planes = imageProxy.getPlanes();
         if (planes.length > 0) {
             ByteBuffer buffer = planes[0].getBuffer();
-            if (buffer != null) {
-                byte[] bytes = new byte[buffer.remaining()];
-                buffer.get(bytes);
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
-            }
+            byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
         }
         return null; // Return null if conversion fails
     }

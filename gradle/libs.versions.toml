@@ -14,6 +14,7 @@ constraintlayout = "2.1.4"
 materialVersion = "<latest_version>"
 navigationFragment = "2.8.0"
 navigationUi = "2.8.0"
+tensorflowLite = "2.3.0"
 
 [libraries]
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraView" }
@@ -32,6 +33,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 material-vlatestversion = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
+tensorflow-lite = { module = "org.tensorflow:tensorflow-lite", version.ref = "tensorflowLite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -35,17 +35,25 @@ android {
 }
 
 dependencies {
+    
 
+    // TensorFlow Lite (Optional, if using ML for feature detection)
+    implementation (libs.tensorflow.lite)
+
+// Camera Libraries for facial detection
     implementation (libs.camera.core)
     implementation (libs.camera.camera2)
     implementation (libs.camera.lifecycle)
     implementation (libs.androidx.camera.view )
     implementation (libs.material.vlatestversion)
     implementation (libs.face.detection)
+//    Biometric detection library
     implementation (libs.biometric)
+//    Default android libs
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
+//    Navigation libs
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     testImplementation(libs.junit)
