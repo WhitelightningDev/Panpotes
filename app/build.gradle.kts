@@ -35,10 +35,12 @@ android {
 }
 
 dependencies {
-    
+
 
     // TensorFlow Lite (Optional, if using ML for feature detection)
     implementation (libs.tensorflow.lite)
+
+
 
 // Camera Libraries for facial detection
     implementation (libs.camera.core)

@@ -1,0 +1,12 @@
+<!-- res/drawable/mab_rounded_icon.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <!-- Reference to the rounded background shape -->
+        <drawable android:drawable="@drawable/mab_logo_rounded_bg" />
+    </item>
+
+    <item>
+        <!-- Reference to your custom icon -->
+        <drawable android:drawable="@drawable/mab_penoptes_tp" />
+    </item>
+</layer-list>

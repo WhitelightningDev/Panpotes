@@ -63,20 +63,21 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(view -> showAddPersonDialog());
     }
 
-    private void showFingerprintDialog(String name, String surname, String id) {
-        // Create and show your custom fingerprint dialog
-        FingerprintDialog fingerprintDialog = new FingerprintDialog(this, name, surname, id);
-        fingerprintDialog.show(); // Show the custom fingerprint dialog
-    }
-
-
-
+//    Request camera permissions
     private void requestCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
         }
     }
 
+//    Show the fingerprint dialog
+    private void showFingerprintDialog(String name, String surname, String id) {
+        // Create and show your custom fingerprint dialog
+        FingerprintDialog fingerprintDialog = new FingerprintDialog(this, name, surname, id);
+        fingerprintDialog.show(); // Show the custom fingerprint dialog
+    }
+
+//    Handle camera permissions result
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+//   Setup Camera
     private void setupCamera() {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 
@@ -134,6 +135,9 @@ public class MainActivity extends AppCompatActivity {
         }, ContextCompat.getMainExecutor(this));
     }
 
+
+
+    // Show the add person dialog
     private void showAddPersonDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.dialog_add_person, null);
@@ -170,14 +174,13 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.show();
     }
-
-
-
-
+//    Show the face scan dialog
     public void showFaceScanDialog(String name, String surname, String id) {
         showFaceCaptureDialog(name, surname, id);
-    }
 
+
+    }
+//    Show the face capture dialog
     private void showFaceCaptureDialog(String name, String surname, String id) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.dialog_face_capture, null);
@@ -230,6 +233,8 @@ public class MainActivity extends AppCompatActivity {
         buttonCancel.setOnClickListener(v -> dialog.dismiss());
     }
 
+
+//    Setup the face camera
     private void setupFaceCamera(PreviewView previewView) {
         Log.d(TAG, "Setting up face camera with PreviewView: " + previewView);
 
@@ -269,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap getCurrentCameraFrame() {
         return lastCapturedFrame; // Return the last captured frame
     }
-
+//    Convert ImageProxy to Bitmap
     private Bitmap imageProxyToBitmap(ImageProxy imageProxy) {
         ImageProxy.PlaneProxy[] planes = imageProxy.getPlanes();
         if (planes.length > 0) {
@@ -280,18 +285,18 @@ public class MainActivity extends AppCompatActivity {
         }
         return null; // Return null if conversion fails
     }
-
+//    Save biometric data
     private void saveBiometricData(String name, String surname, String id) {
         // Save biometric data securely
         Log.d(TAG, "Biometric data saved for " + name + " " + surname + " with ID: " + id);
     }
-
+//    Create the options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
+//    Handle action bar item clicks
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here

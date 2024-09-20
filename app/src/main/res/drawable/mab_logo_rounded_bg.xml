@@ -1,0 +1,5 @@
+<!-- res/drawable/mab_logo_rounded_bg.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@android:color/white" /> <!-- Background color -->
+    <corners android:radius="20dp" /> <!-- Adjust the radius as per your need -->
+</shape>
